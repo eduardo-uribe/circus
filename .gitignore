@@ -5,7 +5,7 @@ node_modules
 __tests__
 
 # custom-reporter for jest
-custom-reporter
+custom-reporter.js
 
 # package-lock.json
 package-lock.json
