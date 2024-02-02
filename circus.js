@@ -6,10 +6,7 @@ async function circus() {
     path.resolve(__dirname, '.'),
   ]);
 
-  /** test */
-  console.log(results.testResults);
   return results;
 }
 
-circus();
 module.exports = circus;

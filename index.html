@@ -4,16 +4,81 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>circus</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #brand {
+        font-size: 32px;
+        margin: 0;
+      }
+
+      ul:first-child,
+      .test-results {
+        border: solid 1px black;
+        border-radius: 2px;
+        max-width: 45ch;
+      }
+
+      .test-results-item {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      #button-run-test {
+        border: none;
+        border-radius: 2px;
+        background-color: black;
+        color: #fafafa;
+        cursor: pointer;
+        padding: 12px 22px;
+      }
+
+      main {
+        display: flex;
+      }
+
+      #dashboard-left,
+      #dashboard-right {
+        border: solid 1px black;
+        flex-grow: 1;
+        padding: 8px;
+        height: 100vh;
+      }
+    </style>
   </head>
   <body>
-    <nav><h1>circus</h1></nav>
     <main>
-      <ul>
-        <li><p data-passing-test>Passing Test:</p></li>
-        <li><p data-failing-test>Failing Test:</p></li>
-      </ul>
-      <p>Run all test.</p>
-      <button type="button">Run</button>
+      <section id="dashboard-left">
+        <h1 id="brand">circus</h1>
+
+        <ul class="test-results">
+          <li class="test-results-item">
+            <p>Pased test:</p>
+            <p>8</p>
+          </li>
+          <li class="test-results-item">
+            <p>Passed test suites:</p>
+            <p>6</p>
+          </li>
+          <li class="test-results-item">
+            <p>Failed test:</p>
+            <p>4</p>
+          </li>
+          <li class="test-results-item">
+            <p>Failed test suites:</p>
+            <p>2</p>
+          </li>
+        </ul>
+        <section data-directory-tree></section>
+        <button id="button-run-test" type="button">Run test</button>
+      </section>
+      <section id="dashboard-right">
+        <h1>Overview</h1>
+      </section>
     </main>
 
     <script>
@@ -22,21 +87,104 @@
           try {
             // run jest and get test results
             const request = await fetch('http://localhost:8080/test-results/');
-            const {
-              numFailedTestSuites,
-              numiledTFaests,
-              numPassedTestSuites,
+            let {
               numPassedTests,
+              numFailedTests,
+              numPassedTestSuites,
+              numFailedTestSuites,
+              result,
             } = await request.json();
 
-            // update view information
-            const passing = document.querySelector('[data-passing-test]');
-            passing.textContent = numPassedTests;
+            const section = document.querySelector('[data-directory-tree]');
+            section.innerHTML = tree(result);
           } catch (error) {
             console.log(error);
           }
         }
       });
+
+      // convert into a web-component
+      function tree(array) {
+        // base of the directory tree
+        let base = `<ul>`;
+
+        for (let i = 0; i < array.length; i++) {
+          // element has children
+          if (array[i].children.length > 0) {
+            // recursive case
+            let folder = `<li><details open><summary>${
+              array[i].name
+            }</summary>${tree(array[i].children)}</li></details>`;
+
+            base += `${folder}`;
+          } else {
+            // element has no children
+            base += `${file(array[i])}`;
+          }
+        }
+
+        // end the base html of the directory tree
+        base += `</ul>`;
+
+        return base;
+      }
+
+      /**
+       * file
+       * @param { Object } element -
+       * @return { String }  - html string for a list element
+       */
+      function file(element) {
+        return `<li><p>${element.name}</p></li>`;
+      }
     </script>
+
+    <!-- HAZARD TESTING BELOW -->
+    <script>
+      // test data
+      const testTreeDataOne = [
+        {
+          name: 'circus',
+          children: [
+            {
+              name: 'components',
+              children: [
+                {
+                  name: 'Nav.test.js',
+                  children: [],
+                },
+                {
+                  name: 'Home',
+                  children: [
+                    {
+                      name: 'Header.test.js',
+                      children: [],
+                    },
+                    {
+                      name: 'Footer.test.js',
+                      children: [],
+                    },
+                  ],
+                },
+                {
+                  name: 'endpoints',
+                  children: [
+                    {
+                      name: 'user.test.js',
+                      children: [],
+                    },
+                    {
+                      name: 'db.test.js',
+                      children: [],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ];
+    </script>
+    <!-- END OF HAZARD -->
   </body>
 </html>
