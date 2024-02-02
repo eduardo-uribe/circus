@@ -58,19 +58,19 @@
         <ul class="test-results">
           <li class="test-results-item">
             <p>Pased test:</p>
-            <p>8</p>
+            <p data-passed-test></p>
           </li>
           <li class="test-results-item">
             <p>Passed test suites:</p>
-            <p>6</p>
+            <p data-passed-test-suites></p>
           </li>
           <li class="test-results-item">
             <p>Failed test:</p>
-            <p>4</p>
+            <p data-failed-test></p>
           </li>
           <li class="test-results-item">
             <p>Failed test suites:</p>
-            <p>2</p>
+            <p data-failed-test-suites></p>
           </li>
         </ul>
         <section data-directory-tree></section>
@@ -94,6 +94,23 @@
               numFailedTestSuites,
               result,
             } = await request.json();
+
+            // render the passed and failed test/suites
+            let testPassed = document.querySelector('[data-passed-test]');
+            testPassed.textContent = numPassedTests;
+
+            let suitesPassed = document.querySelector(
+              '[data-passed-test-suites]'
+            );
+            suitesPassed.textContent = numPassedTestSuites;
+
+            let failedTest = document.querySelector('[data-failed-test]');
+            failedTest.textContent = numFailedTests;
+
+            let failedSuites = document.querySelector(
+              '[data-failed-test-suites]'
+            );
+            failedSuites.textContent = numFailedTestSuites;
 
             const section = document.querySelector('[data-directory-tree]');
             section.innerHTML = tree(result);
@@ -138,53 +155,5 @@
         return `<li><p>${element.name}</p></li>`;
       }
     </script>
-
-    <!-- HAZARD TESTING BELOW -->
-    <script>
-      // test data
-      const testTreeDataOne = [
-        {
-          name: 'circus',
-          children: [
-            {
-              name: 'components',
-              children: [
-                {
-                  name: 'Nav.test.js',
-                  children: [],
-                },
-                {
-                  name: 'Home',
-                  children: [
-                    {
-                      name: 'Header.test.js',
-                      children: [],
-                    },
-                    {
-                      name: 'Footer.test.js',
-                      children: [],
-                    },
-                  ],
-                },
-                {
-                  name: 'endpoints',
-                  children: [
-                    {
-                      name: 'user.test.js',
-                      children: [],
-                    },
-                    {
-                      name: 'db.test.js',
-                      children: [],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ];
-    </script>
-    <!-- END OF HAZARD -->
   </body>
 </html>
